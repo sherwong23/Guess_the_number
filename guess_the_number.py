@@ -1,7 +1,7 @@
 import random
 
 def guess_the_number():
-    print("欢迎来到猜数字游戏！")
+    print("welcome to my number guess game！")
     print("我已经选好了一个 1 到 100 之间的数字，你来猜猜看！")
 
     # 随机生成一个 1 到 100 之间的数字
