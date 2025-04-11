@@ -1,31 +1,76 @@
+import tkinter as tk
+from tkinter import messagebox
 import random
+import time
 
-def guess_the_number():
-    print("welcome to my number guess game！")
-    print("我已经选好了一个 1 到 100 之间的数字，你来猜猜看！")
+class GuessNumberGame:
+    def __init__(self, master):
+        self.master = master
+        master.title("猜数字游戏 🎮")
+        master.geometry("400x300")
 
-    # 随机生成一个 1 到 100 之间的数字
-    number_to_guess = random.randint(1, 100)
-    guesses_taken = 0
+        self.number_to_guess = random.randint(1, 100)
+        self.guess_count = 0
+        self.start_time = time.time()
 
-    while True:
-        # 获取玩家输入
+        self.label = tk.Label(master, text="我选了 1 到 100 之间的一个数字，猜猜看！", font=("Arial", 14))
+        self.label.pack(pady=10)
+
+        self.entry = tk.Entry(master, font=("Arial", 14))
+        self.entry.pack()
+
+        self.result_label = tk.Label(master, text="", font=("Arial", 12), fg="blue")
+        self.result_label.pack(pady=5)
+
+        self.hint_label = tk.Label(master, text="", font=("Arial", 12), fg="green")
+        self.hint_label.pack()
+
+        self.submit_button = tk.Button(master, text="提交", command=self.check_guess, font=("Arial", 12))
+        self.submit_button.pack(pady=10)
+
+        self.reset_button = tk.Button(master, text="再来一次", command=self.reset_game, font=("Arial", 12))
+        self.reset_button.pack(pady=5)
+
+    def check_guess(self):
         try:
-            player_guess = int(input("请输入你的猜测："))
+            guess = int(self.entry.get())
         except ValueError:
-            print("请输入一个有效的数字！")
-            continue
-        
-        guesses_taken += 1
+            self.result_label.config(text="请输入一个有效的整数！", fg="red")
+            return
 
-        if player_guess < number_to_guess:
-            print("太小了！再试试吧。")
-        elif player_guess > number_to_guess:
-            print("太大了！再试试吧。")
+        self.guess_count += 1
+
+        if guess < self.number_to_guess:
+            self.result_label.config(text="太小了！", fg="orange")
+            self.give_hint(guess)
+        elif guess > self.number_to_guess:
+            self.result_label.config(text="太大了！", fg="orange")
+            self.give_hint(guess)
         else:
-            print(f"恭喜你！你猜对了，数字是 {number_to_guess}。")
-            print(f"你猜了 {guesses_taken} 次。")
-            break
+            end_time = time.time()
+            time_used = int(end_time - self.start_time)
+            messagebox.showinfo("恭喜！", f"你猜对了！数字是 {self.number_to_guess} 🎉\n"
+                                          f"你共猜了 {self.guess_count} 次\n"
+                                          f"用时 {time_used} 秒")
+            self.reset_game()
+
+    def give_hint(self, guess):
+        if abs(guess - self.number_to_guess) <= 10:
+            self.hint_label.config(text="🔥 很接近了！", fg="green")
+        elif guess < self.number_to_guess:
+            self.hint_label.config(text="提示：数字更大哦 📈", fg="gray")
+        else:
+            self.hint_label.config(text="提示：数字更小哦 📉", fg="gray")
+
+    def reset_game(self):
+        self.number_to_guess = random.randint(1, 100)
+        self.guess_count = 0
+        self.start_time = time.time()
+        self.entry.delete(0, tk.END)
+        self.result_label.config(text="")
+        self.hint_label.config(text="")
 
 if __name__ == "__main__":
-    guess_the_number()
+    root = tk.Tk()
+    game = GuessNumberGame(root)
+    root.mainloop()
